@@ -10,6 +10,7 @@
   "private": true,
   "dependencies": {
     "express": "^5.1.0",
+    "joi": "^17.13.3",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7"
   },
