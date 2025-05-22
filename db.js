@@ -1,5 +1,7 @@
-require("dotenv").config();
-const { Sequelize } = require("sequelize");
+import dotenv from "dotenv";
+import { Sequelize } from "sequelize";
+
+dotenv.config();
 
 const DB_NAME = process.env.DB_NAME || "support_ticket";
 const DB_USER = process.env.DB_USER || "postgres";
@@ -11,4 +13,4 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   dialect: "postgres",
 });
 
-module.exports = sequelize;
+export default sequelize;

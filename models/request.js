@@ -1,8 +1,9 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../db");
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../db.js";
 
-const Request = sequelize.define(
-  "Request",
+class Request extends Model {}
+
+Request.init(
   {
     topic: { type: DataTypes.STRING, allowNull: false },
     text: { type: DataTypes.TEXT, allowNull: false },
@@ -15,8 +16,10 @@ const Request = sequelize.define(
     cancellationReason: { type: DataTypes.TEXT },
   },
   {
+    sequelize,
+    modelName: "Request",
     timestamps: true,
   },
 );
 
-module.exports = Request;
+export default Request;

@@ -1,11 +1,11 @@
-const express = require("express");
-const Request = require("../models/request");
-const { createRequestSchema } = require("../validation/requestSchemas");
-const {
-  completeRequestSchema,
+import express from "express";
+import Request from "../models/Request.js";
+import {
   cancelRequestSchema,
+  completeRequestSchema,
+  createRequestSchema,
   dateFilterSchema,
-} = require("../validation/requestSchemas");
+} from "../validation/requestSchemas.js";
 
 const router = express.Router();
 
@@ -126,16 +126,19 @@ router.get("/", async (req, res) => {
 
 router.post("/cancel", async (req, res) => {
   try {
-    const [updatedCount] = await Request.update(
+    const [cancelledCount, cancelledRequests] = await Request.update(
       { status: "cancelled" },
-      { where: { status: "in_progress" } },
+      {
+        where: { status: "in_progress" },
+        returning: true,
+      },
     );
 
-    res.json({ cancelled: updatedCount });
+    res.json({ cancelledCount, cancelledRequests });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error:", err });
   }
 });
 
-module.exports = router;
+export default router;
