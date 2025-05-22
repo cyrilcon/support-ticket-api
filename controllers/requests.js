@@ -1,15 +1,12 @@
-import express from "express";
-import Request from "../models/Request.js";
 import {
   cancelRequestSchema,
   completeRequestSchema,
   createRequestSchema,
   dateFilterSchema,
 } from "../validation/requestSchemas.js";
+import Request from "../models/Request.js";
 
-const router = express.Router();
-
-router.post("/", async (req, res) => {
+export const postRequestHandler = async (req, res) => {
   try {
     const { error, value } = createRequestSchema.validate(req.body);
 
@@ -23,9 +20,9 @@ router.post("/", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Internal server error:", err });
   }
-});
+};
 
-router.post("/:id/take", async (req, res) => {
+export const postTakeRequestHandler = async (req, res) => {
   try {
     const request = await Request.findByPk(req.params.id);
     if (!request) {
@@ -41,9 +38,9 @@ router.post("/:id/take", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Internal server error:", err });
   }
-});
+};
 
-router.post("/:id/complete", async (req, res) => {
+export const postCompleteRequestHandler = async (req, res) => {
   try {
     const { error, value } = completeRequestSchema.validate(req.body);
     if (error) {
@@ -65,9 +62,9 @@ router.post("/:id/complete", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Internal server error:", err });
   }
-});
+};
 
-router.post("/:id/cancel", async (req, res) => {
+export const postCancelSingleRequestHandler = async (req, res) => {
   try {
     const { error, value } = cancelRequestSchema.validate(req.body);
     if (error) {
@@ -89,9 +86,9 @@ router.post("/:id/cancel", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Internal server error:", err });
   }
-});
+};
 
-router.get("/", async (req, res) => {
+export const getRequestByDateHandler = async (req, res) => {
   try {
     const { error, value } = dateFilterSchema.validate(req.query);
     if (error) {
@@ -122,9 +119,9 @@ router.get("/", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Internal server error:", err });
   }
-});
+};
 
-router.post("/cancel", async (req, res) => {
+export const postCancelAllRequestsHandler = async (req, res) => {
   try {
     const [cancelledCount, cancelledRequests] = await Request.update(
       { status: "cancelled" },
@@ -139,6 +136,4 @@ router.post("/cancel", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Internal server error:", err });
   }
-});
-
-export default router;
+};
