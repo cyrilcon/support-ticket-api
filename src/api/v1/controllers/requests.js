@@ -7,6 +7,15 @@ import {
 } from "../validation/requestSchemas.js";
 import Request from "../models/Request.js";
 
+/**
+ * Creates a new anonymous support request.
+ *
+ * Expects `topic` and `text` in the request body.
+ * Returns the created request with status 201.
+ *
+ * @param {import('express').Request} req - Express request object
+ * @param {import('express').Response} res - Express response object
+ */
 export const postRequestHandler = async (req, res) => {
   try {
     const { error, value } = createRequestSchema.validate(req.body);
@@ -25,6 +34,15 @@ export const postRequestHandler = async (req, res) => {
   }
 };
 
+/**
+ * Marks an existing request as "in_progress".
+ *
+ * Looks up the request by ID from the URL path.
+ * Returns 404 if not found.
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 export const postTakeRequestHandler = async (req, res) => {
   try {
     const request = await Request.findByPk(req.params.id);
@@ -45,6 +63,16 @@ export const postTakeRequestHandler = async (req, res) => {
   }
 };
 
+/**
+ * Completes a request by setting its status to "done"
+ * and saving the provided solution text.
+ *
+ * Expects `solution` in the request body.
+ * Returns 404 if the request is not found.
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 export const postCompleteRequestHandler = async (req, res) => {
   try {
     const { error, value } = completeRequestSchema.validate(req.body);
@@ -71,6 +99,15 @@ export const postCompleteRequestHandler = async (req, res) => {
   }
 };
 
+/**
+ * Cancels a specific request with a given reason.
+ *
+ * Expects `reason` in the request body.
+ * Returns 404 if the request is not found.
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 export const postCancelSingleRequestHandler = async (req, res) => {
   try {
     const { error, value } = cancelRequestSchema.validate(req.body);
@@ -97,6 +134,16 @@ export const postCancelSingleRequestHandler = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves all requests, optionally filtered by:
+ * - a specific date (`date`)
+ * - a date range (`from`, `to`)
+ *
+ * Query parameters are validated. If no filter is applied, all records are returned.
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 export const getRequestByDateHandler = async (req, res) => {
   try {
     const { error, value } = dateFilterSchema.validate(req.query);
@@ -142,6 +189,15 @@ export const getRequestByDateHandler = async (req, res) => {
   }
 };
 
+/**
+ * Cancels all requests that are currently in "in_progress" status.
+ *
+ * Performs a bulk update and returns the number of affected rows
+ * along with the updated records.
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 export const postCancelAllRequestsHandler = async (req, res) => {
   try {
     const [cancelledCount, cancelledRequests] = await Request.update(
