@@ -18,6 +18,7 @@ Request.init(
   {
     sequelize,
     modelName: "Request",
+    tableName: "requests",
     timestamps: true,
   },
 );

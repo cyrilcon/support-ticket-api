@@ -14,7 +14,7 @@ export const cancelRequestSchema = Joi.object({
 });
 
 export const dateFilterSchema = Joi.object({
-  date: Joi.string().isoDate(),
-  from: Joi.string().isoDate(),
-  to: Joi.string().isoDate(),
+  date: Joi.date().iso(),
+  from: Joi.date().iso(),
+  to: Joi.date().iso(),
 });

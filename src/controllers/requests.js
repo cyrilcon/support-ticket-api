@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import {
   cancelRequestSchema,
   completeRequestSchema,
@@ -18,7 +19,9 @@ export const postRequestHandler = async (req, res) => {
     res.status(201).json(request);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Internal server error:", err });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: err.message });
   }
 };
 
@@ -36,7 +39,9 @@ export const postTakeRequestHandler = async (req, res) => {
     res.json(request);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Internal server error:", err });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: err.message });
   }
 };
 
@@ -60,7 +65,9 @@ export const postCompleteRequestHandler = async (req, res) => {
     res.json(request);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Internal server error:", err });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: err.message });
   }
 };
 
@@ -84,40 +91,54 @@ export const postCancelSingleRequestHandler = async (req, res) => {
     res.json(request);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Internal server error:", err });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: err.message });
   }
 };
 
 export const getRequestByDateHandler = async (req, res) => {
   try {
     const { error, value } = dateFilterSchema.validate(req.query);
+
     if (error) {
       return res.status(400).json({ error: error.details[0].message });
     }
 
     const { date, from, to } = value;
-    let where = {};
+    const where = {};
 
     if (date) {
-      const parsedDate = new Date(date);
-      const nextDay = new Date(parsedDate);
-      nextDay.setDate(parsedDate.getDate() + 1);
+      const nextDay = new Date(date);
+      nextDay.setDate(date.getDate() + 1);
 
       where.createdAt = {
-        [require("sequelize").Op.gte]: parsedDate,
-        [require("sequelize").Op.lt]: nextDay,
+        [Op.gte]: date,
+        [Op.lt]: nextDay,
       };
-    } else if (from && to) {
-      where.createdAt = {
-        [require("sequelize").Op.between]: [new Date(from), new Date(to)],
-      };
+    } else {
+      const createdAt = {};
+
+      if (from) {
+        createdAt[Op.gte] = from;
+      }
+
+      if (to) {
+        createdAt[Op.lte] = to;
+      }
+
+      if (Reflect.ownKeys(createdAt).length > 0) {
+        where.createdAt = createdAt;
+      }
     }
 
     const requests = await Request.findAll({ where });
     res.json(requests);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Internal server error:", err });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: err.message });
   }
 };
 
@@ -134,6 +155,8 @@ export const postCancelAllRequestsHandler = async (req, res) => {
     res.json({ cancelledCount, cancelledRequests });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Internal server error:", err });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: err.message });
   }
 };
