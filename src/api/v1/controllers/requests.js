@@ -6,6 +6,7 @@ import {
   dateFilterSchema,
 } from "../validation/requestSchemas.js";
 import Request from "../models/Request.js";
+import RequestStatus from "../constants/requestStatus.js";
 
 /**
  * Creates a new anonymous support request.
@@ -13,8 +14,8 @@ import Request from "../models/Request.js";
  * Expects `topic` and `text` in the request body.
  * Returns the created request with status 201.
  *
- * @param {import('express').Request} req - Express request object
- * @param {import('express').Response} res - Express response object
+ * @param {import("express").Request} req - Express request object
+ * @param {import("express").Response} res - Express response object
  */
 export const postRequestHandler = async (req, res) => {
   try {
@@ -40,8 +41,8 @@ export const postRequestHandler = async (req, res) => {
  * Looks up the request by ID from the URL path.
  * Returns 404 if not found.
  *
- * @param {import('express').Request} req
- * @param {import('express').Response} res
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
  */
 export const postTakeRequestHandler = async (req, res) => {
   try {
@@ -52,7 +53,7 @@ export const postTakeRequestHandler = async (req, res) => {
         .json({ error: `Request with ID ${req.params.id} not found` });
     }
 
-    request.status = "in_progress";
+    request.status = RequestStatus.IN_PROGRESS;
     await request.save();
     res.json(request);
   } catch (err) {
@@ -70,8 +71,8 @@ export const postTakeRequestHandler = async (req, res) => {
  * Expects `solution` in the request body.
  * Returns 404 if the request is not found.
  *
- * @param {import('express').Request} req
- * @param {import('express').Response} res
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
  */
 export const postCompleteRequestHandler = async (req, res) => {
   try {
@@ -87,7 +88,7 @@ export const postCompleteRequestHandler = async (req, res) => {
         .json({ error: `Request with ID ${req.params.id} not found` });
     }
 
-    request.status = "done";
+    request.status = RequestStatus.DONE;
     request.solution = value.solution;
     await request.save();
     res.json(request);
@@ -105,8 +106,8 @@ export const postCompleteRequestHandler = async (req, res) => {
  * Expects `reason` in the request body.
  * Returns 404 if the request is not found.
  *
- * @param {import('express').Request} req
- * @param {import('express').Response} res
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
  */
 export const postCancelSingleRequestHandler = async (req, res) => {
   try {
@@ -122,7 +123,7 @@ export const postCancelSingleRequestHandler = async (req, res) => {
         .json({ error: `Request with ID ${req.params.id} not found` });
     }
 
-    request.status = "cancelled";
+    request.status = RequestStatus.CANCELLED;
     request.cancellationReason = value.reason;
     await request.save();
     res.json(request);
@@ -141,8 +142,8 @@ export const postCancelSingleRequestHandler = async (req, res) => {
  *
  * Query parameters are validated. If no filter is applied, all records are returned.
  *
- * @param {import('express').Request} req
- * @param {import('express').Response} res
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
  */
 export const getRequestByDateHandler = async (req, res) => {
   try {
@@ -195,15 +196,15 @@ export const getRequestByDateHandler = async (req, res) => {
  * Performs a bulk update and returns the number of affected rows
  * along with the updated records.
  *
- * @param {import('express').Request} req
- * @param {import('express').Response} res
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
  */
 export const postCancelAllRequestsHandler = async (req, res) => {
   try {
     const [cancelledCount, cancelledRequests] = await Request.update(
-      { status: "cancelled" },
+      { status: RequestStatus.CANCELLED },
       {
-        where: { status: "in_progress" },
+        where: { status: RequestStatus.IN_PROGRESS },
         returning: true,
       },
     );

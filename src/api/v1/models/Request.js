@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../db.js";
+import RequestStatus from "../constants/requestStatus.js";
 
 class Request extends Model {}
 
@@ -8,7 +9,12 @@ Request.init(
     topic: { type: DataTypes.STRING, allowNull: false },
     text: { type: DataTypes.TEXT, allowNull: false },
     status: {
-      type: DataTypes.ENUM("new", "in_progress", "done", "cancelled"),
+      type: DataTypes.ENUM(
+        RequestStatus.NEW,
+        RequestStatus.IN_PROGRESS,
+        RequestStatus.DONE,
+        RequestStatus.CANCELLED,
+      ),
       defaultValue: "new",
       allowNull: false,
     },
